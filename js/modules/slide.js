@@ -2,6 +2,11 @@ export default class Slide {
   constructor(wrapper, slide) {
     this.wrapper = this.constructor.elementQuerySelector(wrapper);
     this.slide = this.constructor.elementQuerySelector(slide);
+    this.dist = {
+      finalPosition: 0,
+      startX: 0,
+      movement: 0
+    }
   }
 
   // Metódo para selecionar os elementos
@@ -9,21 +14,32 @@ export default class Slide {
     return document.querySelector(element);
   }
 
+  moveSlide(distX) {
+    this.dist.movePosition = distX;
+    this.slide.style.transform = `translate3d(${distX}px, 0, 0)`;
+  }
+
+  updatePosition(clientX) {
+    this.dist.movement = ( this.dist.startX - clientX ) * 1.5;
+    return this.dist.finalPosition - this.dist.movement; 
+  }
+
   onStart(event) {
     event.preventDefault();
-    console.log("Click");
+    this.dist.startX = event.clientX;
     this.wrapper.addEventListener('mousemove', this.onMove);
   }
 
   onMove(event) {
     event.preventDefault();
-    console.log("Movendo");
+    const finalPosition = this.updatePosition(event.clientX);
+    this.moveSlide(finalPosition);
   }
 
   onEnd(event) {
     event.preventDefault();
-    console.log("Acabou");
     this.wrapper.removeEventListener('mousemove', this.onMove);
+    this.dist.finalPosition = this.dist.movePosition;
   }
 
   // Adicionando ao wrapper oevento de click
